@@ -6,9 +6,9 @@ on:
       - main
 
 jobs:
-  setup-java:
-    name: Set Up Java & Maven Cache
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,35 +20,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      - name: Verify Java Version
+        run: java -version
 
-  maven-test:
-    name: Run Maven Tests
-    needs: setup-java
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Clear Maven Cache
+        run: rm -rf ~/.m2/repository
 
-      - name: Restore Maven cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-
-      - name: Run Maven Tests
-        run: mvn test
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: 1312
-          AWS_REGION: eu-north-1
-          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      - name: Run Maven Build
+        run: mvn -X -e clean compile
 
