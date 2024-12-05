@@ -6,10 +6,26 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build and Test
+  setup-db:
+    name: Set Up MySQL Database
     runs-on: ubuntu-latest
+    steps:
+      - name: Start MySQL Service
+        uses: mirromutth/mysql-action@v1
+        with:
+          mysql-version: '8.0'
+          root-password: '1312'
+          database: 'buildLedgerSchema'
 
+      - name: Verify MySQL Connection
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql -h 127.0.0.1 -P 3306 -u root -p1312 -e "SHOW DATABASES;"
+
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    needs: setup-db
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,9 +40,6 @@ jobs:
       - name: Verify Java Version
         run: java -version
 
-      - name: Clear Maven Cache
-        run: rm -rf ~/.m2/repository
-
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
@@ -35,15 +48,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Run Maven Build
+      - name: Clear Maven Cache
+        run: rm -rf ~/.m2/repository
+
+      - name: Build with Maven
         run: mvn -X -e clean compile
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: [setup-db, build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Restore Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 
       - name: Run Maven Tests
         run: mvn test
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: 1312
           AWS_REGION: eu-north-1
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+
