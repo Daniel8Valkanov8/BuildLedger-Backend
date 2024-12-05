@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: BuildLedger
+
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: root
+    password: 1312
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
+
+management:
+  endpoints:
+    enabled-by-default: true
+cloud:
+  aws:
+    region:
+      static:  eu-north-1 #${AWS_REGION} Замени с твоя регион
+    credentials:
+      access-key: AKIA4T4OCM5SWKKOGIQB  #${AWS_ACCESS_KEY} #
+      secret-key: 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 #${AWS_SECRET_KEY}
+s3:
+  bucket-name: build-ledger  # Името на S3 бъкета
+  uploads-dir: uploads/

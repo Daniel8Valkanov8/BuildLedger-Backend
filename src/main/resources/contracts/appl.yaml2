@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: BuildLedger
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+
+  datasource:
+    #url: jdbc:mysql://my-mysql-container-buildledger:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+
+    url: jdbc:mysql://mysql:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC #${SPRING_DATASOURCE_URL}
+
+    username: root #${SPRING_DATASOURCE_USERNAME}
+    password: 1312 #${SPRING_DATASOURCE_PASSWORD}
+    #username: root
+    #password: 1312
+    #.
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #for container
+    #.my-mysql-container-buildledger:3306
+
+    #.
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8080
+
+cloud:
+  aws:
+    region:
+      static:  eu-north-1 #${AWS_REGION} Замени с твоя регион
+    credentials:
+      access-key: AKIA4T4OCM5SWKKOGIQB  #${AWS_ACCESS_KEY} #
+      secret-key: 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 #${AWS_SECRET_KEY}
+s3:
+  bucket-name: build-ledger  # Името на S3 бъкета
+  uploads-dir: uploads/
+
+management:
+  endpoints:
+    enabled-by-default: true

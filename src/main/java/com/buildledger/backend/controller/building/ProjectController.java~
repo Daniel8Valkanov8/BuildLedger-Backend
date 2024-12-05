@@ -1,0 +1,66 @@
+package com.buildledger.backend.controller.building;
+
+import com.buildledger.backend.dto.request.building.CreateNewProjectDTO;
+import com.buildledger.backend.dto.request.building.UpdateProjectDTO;
+import com.buildledger.backend.dto.responce.building.ResponseByIdProjectDTO;
+import com.buildledger.backend.dto.responce.building.ResponseNewProjectDTO;
+import com.buildledger.backend.service.impl.ProjectService;
+import com.buildledger.backend.service.micro.ProjectDeleteService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/projects")
+public class ProjectController {
+
+    private final ProjectService projectService;
+    private final ProjectDeleteService projectDeleteService;
+    public ProjectController(ProjectService projectService, ProjectDeleteService projectDeleteService) {
+        this.projectService = projectService;
+        this.projectDeleteService = projectDeleteService;
+    }
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<String> deleteProject(@PathVariable Long id) {
+        String response = projectDeleteService.deleteProject(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PostMapping("/create")
+    public ResponseEntity<ResponseNewProjectDTO> createNewProject(
+            @Valid @RequestBody CreateNewProjectDTO createNewProjectDTO) {
+        ResponseNewProjectDTO response = projectService.createNewProject(createNewProjectDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseByIdProjectDTO> getProjectById(@PathVariable Long id) {
+        ResponseByIdProjectDTO project = projectService.getProjectById(id);
+        return ResponseEntity.ok(project);
+    }
+
+    @GetMapping("/parcel/{id}")
+    public ResponseEntity<String> getProjectByParcelId(@PathVariable Long id) {
+        System.out.println("in controller");
+        String projectTitle = projectService.getProjectByParcelId(id);
+        return ResponseEntity.ok(projectTitle);
+    }
+    @PutMapping("/{id}/update")
+    public ResponseEntity<ResponseNewProjectDTO> updateProject(@PathVariable Long id,
+                                                               @RequestBody @Valid UpdateProjectDTO updateProjectDTO){
+        ResponseNewProjectDTO response = projectService.updateProject(id, updateProjectDTO);
+        return ResponseEntity.ok(response);
+
+    }
+
+
+                                                               @GetMapping("/all")
+    public ResponseEntity<List<ResponseNewProjectDTO>> getAllProjects() {
+        List<ResponseNewProjectDTO> projects = projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+
+}

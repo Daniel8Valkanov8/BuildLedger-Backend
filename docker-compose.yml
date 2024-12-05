@@ -1,0 +1,33 @@
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 131212
+      MYSQL_USER: dnvdev
+      MYSQL_PASSWORD: 131212
+      MYSQL_DATABASE: buildLedgerSchema
+      AWS_REGION: eu-north-1
+      AWS_ACCESS_KEY: AKIA4T4OCM5SWKKOGIQB
+      AWS_SECRET_KEY: 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
+
+  spring-boot-app:
+    build:
+      context: ../../Build-Ledger-Frontend/build-ledger-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/buildLedgerSchema
+      SPRING_DATASOURCE_USERNAME: dnvdev
+      SPRING_DATASOURCE_PASSWORD: 131212
+
+  react-app:
+    build:
+      context: ../../Build-Ledger-Frontend/build-ledger-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
