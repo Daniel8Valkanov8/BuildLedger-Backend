@@ -89,18 +89,59 @@ public class ApartmentService {
         ResponseApartmentDTO responseApartmentDTO = new ResponseApartmentDTO();
         if (apartment.isPresent()) {
            Apartment apartment1 = apartment.get();
-           apartment1.setArea(updateApartmentDTO.getArea());
-            Floor floor = floorRepository.findById(updateApartmentDTO.getFloorId()).get();
-           apartment1.setFloor(floor);
-           apartment1.setPriceEur(updateApartmentDTO.getPriceEur());
-           apartment1.setBedroomCount(updateApartmentDTO.getBedroomCount());
-           apartment1.setBathroomCount(updateApartmentDTO.getBathroomCount());
+           convertUpdateToEntity(updateApartmentDTO, apartment1);
+
            Apartment savedApartment = apartmentRepository.saveAndFlush(apartment1);
-            BeanUtils.copyProperties(savedApartment, responseApartmentDTO);
-            setFloorIdCatchNull(responseApartmentDTO, savedApartment);
+           BeanUtils.copyProperties(savedApartment, responseApartmentDTO);
+           setFloorIdCatchNull(responseApartmentDTO, savedApartment);
+
         }
         return responseApartmentDTO;
     }
+
+    private void convertUpdateToEntity(UpdateApartmentDTO updateApartmentDTO, Apartment apartment1) {
+        if (updateApartmentDTO.getArea() != 0) {
+            apartment1.setArea(updateApartmentDTO.getArea());
+        }
+        if (updateApartmentDTO.getFloorId() != 0) {
+            floorRepository.findById(updateApartmentDTO.getFloorId())
+                    .ifPresent(apartment1::setFloor);
+        }
+        if (updateApartmentDTO.getPriceEur() != 0) {
+            apartment1.setPriceEur(updateApartmentDTO.getPriceEur());
+        }
+        if (updateApartmentDTO.getBedroomCount() != 0) {
+            apartment1.setBedroomCount(updateApartmentDTO.getBedroomCount());
+        }
+        if (updateApartmentDTO.getBathroomCount() != 0) {
+            apartment1.setBathroomCount(updateApartmentDTO.getBathroomCount());
+        }
+        if (updateApartmentDTO.getCleanArea() != 0) {
+            apartment1.setCleanArea(updateApartmentDTO.getCleanArea());
+        }
+        if (updateApartmentDTO.getCommonPartsPercentage() != 0) {
+            apartment1.setCommonPartsPercentage(updateApartmentDTO.getCommonPartsPercentage());
+        }
+        if (updateApartmentDTO.getCommonParts() != 0) {
+            apartment1.setCommonParts(updateApartmentDTO.getCommonParts());
+        }
+        if (updateApartmentDTO.getAdjoiningTerrace() != 0) {
+            apartment1.setAdjoiningTerrace(updateApartmentDTO.getAdjoiningTerrace());
+        }
+        if (updateApartmentDTO.getAdjoiningYardRoof() != 0) {
+            apartment1.setAdjoiningYardRoof(updateApartmentDTO.getAdjoiningYardRoof());
+        }
+        if (updateApartmentDTO.getCompensation() != null) {
+            apartment1.setCompensation(updateApartmentDTO.getCompensation());
+        }
+        if (updateApartmentDTO.getPricePerSquareMeter() != 0) {
+            apartment1.setPricePerSquareMeter(updateApartmentDTO.getPricePerSquareMeter());
+        }
+        if (updateApartmentDTO.getPriceYard() != 0) {
+            apartment1.setPriceYard(updateApartmentDTO.getPriceYard());
+        }
+    }
+
 
     private static void setFloorIdCatchNull(ResponseApartmentDTO responseApartmentDTO, Apartment savedApartment) {
         if(savedApartment.getFloor()!=null) {
@@ -111,7 +152,7 @@ public class ApartmentService {
 
     private static void setFloorIdCatchNull(ResponseApartmentInformationDTO responseApartmentDTO, Apartment savedApartment) {
         if(savedApartment.getFloor()!=null) {
-            responseApartmentDTO.setFloorId(savedApartment.getFloor().getId());
+            responseApartmentDTO.setFloorId(savedApartment.getFloor().getNumber());
         }
 
     }
@@ -151,7 +192,7 @@ public class ApartmentService {
         responseApartmentDTO.setPriceEur(apartment.getPriceEur());
         responseApartmentDTO.setBedroomCount(apartment.getBedroomCount());
         responseApartmentDTO.setBathroomCount(apartment.getBathroomCount());
-        responseApartmentDTO.setFloorId(apartment.getFloor().getId());
+        responseApartmentDTO.setFloorId(apartment.getFloor().getNumber());
         responseApartmentDTO.setSold(apartment.isSold());
         responseApartmentDTO.setDescription(apartment.getDescription());
 

@@ -4,6 +4,7 @@ import com.buildledger.backend.dto.request.building.CreateIntermediateDTO;
 import com.buildledger.backend.dto.responce.ResponseMessageDTO;
 import com.buildledger.backend.service.impl.building.*;
 import jakarta.validation.Valid;
+import org.hibernate.TransientObjectException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,16 +58,36 @@ public class IntermediateController {
     }
 
     @DeleteMapping("/cooperation/{id}/delete-objects")
-    public ResponseEntity<List<ResponseMessageDTO>> deleteAllObjectsInCooperation(@PathVariable Long id) {
+    public ResponseEntity<?> deleteAllObjectsInCooperation(@PathVariable Long id) {
         List<ResponseMessageDTO> response = new ArrayList<>();
-        apartmentService.deleteAllApartmentsByCooperationId(id);
-        response.add(new ResponseMessageDTO("Apartments deleted successfully"));
-        garageService.deleteAllGaragesByCooperationId(id);
-        response.add(new ResponseMessageDTO("Garages deleted successfully"));
-        floorService.deleteAllFloorsByCooperationId(id);
-        response.add(new ResponseMessageDTO("Floors deleted successfully"));
-        parkingPlaceService.deleteAllParkingPlacesByCooperationId(id);
-        response.add(new ResponseMessageDTO("Objects deleted successfully"));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+
+        try {
+            // Attempt to delete apartments
+            apartmentService.deleteAllApartmentsByCooperationId(id);
+            response.add(new ResponseMessageDTO("Apartments deleted successfully"));
+
+            // Attempt to delete garages
+            garageService.deleteAllGaragesByCooperationId(id);
+            response.add(new ResponseMessageDTO("Garages deleted successfully"));
+
+            // Attempt to delete floors
+            floorService.deleteAllFloorsByCooperationId(id);
+            response.add(new ResponseMessageDTO("Floors deleted successfully"));
+
+            // Attempt to delete parking places
+            parkingPlaceService.deleteAllParkingPlacesByCooperationId(id);
+            response.add(new ResponseMessageDTO("Parking places deleted successfully"));
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (TransientObjectException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ResponseMessageDTO("Check for outstanding sales"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessageDTO("Check for outstanding sales" ));
+        }
     }
+
+
 }

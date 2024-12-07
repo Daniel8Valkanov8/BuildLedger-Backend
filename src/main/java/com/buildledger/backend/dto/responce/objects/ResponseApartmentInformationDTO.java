@@ -19,7 +19,7 @@ public class ResponseApartmentInformationDTO {
     private String number;
     private double area;
     private double priceEur;
-    private long floorId;
+    private String floorNumber;
     private boolean sold;
     private String description;
     private int bedroomCount;
@@ -30,12 +30,29 @@ public class ResponseApartmentInformationDTO {
     private double totalPriceInEuro;
     private double brokerProfitInEuro;
     private double brokerProfitInPercentage;
+    private double priceYard;
 
 
     private String broker;
     private String purchaser;
     private LocalDate contractDate;
     private int installmentCount;
+
+    public String getFloorNumber() {
+        return floorNumber;
+    }
+
+    public void setFloorNumber(String floorNumber) {
+        this.floorNumber = floorNumber;
+    }
+
+    public double getPriceYard() {
+        return priceYard;
+    }
+
+    public void setPriceYard(double priceYard) {
+        this.priceYard = priceYard;
+    }
 
     public long getId() {
         return id;
@@ -69,12 +86,12 @@ public class ResponseApartmentInformationDTO {
         this.priceEur = priceEur;
     }
 
-    public long getFloorId() {
-        return floorId;
+    public String getFloorId() {
+        return floorNumber;
     }
 
-    public void setFloorId(long floorId) {
-        this.floorId = floorId;
+    public void setFloorId(String floorId) {
+        this.floorNumber = floorId;
     }
 
     public boolean isSold() {
