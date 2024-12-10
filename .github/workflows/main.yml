@@ -8,6 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: buildLedgerSchema
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -19,39 +33,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Install MySQL Server
-        run: sudo apt-get update && sudo apt-get install -y mysql-server
-
-      - name: Start MySQL Service
-        run: |
-          sudo service mysql start
-          sleep 5
-
-      - name: Check MySQL Status
-        run: sudo service mysql status
-
-      - name: Create Test Database
-        run: |
-          mysql -u root -e "CREATE DATABASE IF NOT EXISTS buildLedgerSchema;"
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Run Maven Build
-        run: mvn -X -e clean compile
-
-      - name: Run Maven Tests
-        run: mvn test
+      - name: Run Maven Build and Tests
+        run: mvn clean verify
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/buildLedgerSchema?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
           SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: ''
+          SPRING_DATASOURCE_PASSWORD: root
           AWS_REGION: eu-north-1
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-
