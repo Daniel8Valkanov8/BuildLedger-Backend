@@ -33,8 +33,17 @@ public class Sell extends BaseEntity {
     private Building building;
 
     private String description;
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
     //todo file upload
-    //private String filePath;
+    private String filePath;
     private LocalDate contractDate;
 
 

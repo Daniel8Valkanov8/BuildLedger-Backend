@@ -38,9 +38,11 @@ public class SellController {
             @RequestPart("payload") String payload)
 
     {  // Добавяме JSON данните като String
-        String successSavedFile = this.fileMicroService.saveFile(file);
+        //String successSavedFile = this.fileMicroService.saveFile(file);
         CreateSellDTO createSellDTO = this.mapperToCreateSellDTO(payload);
-        String response = sellService.createSell(id, createSellDTO);
+        String response = sellService.createSell(id,
+                createSellDTO,
+                fileMicroService.saveFileToContracts(file));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

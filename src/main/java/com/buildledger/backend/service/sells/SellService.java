@@ -24,6 +24,7 @@ import com.buildledger.backend.model.sos.ParkingPlace;
 import com.buildledger.backend.repository.*;
 import com.buildledger.backend.service.impl.BrokerService;
 import com.buildledger.backend.service.impl.PurchaserService;
+import com.buildledger.backend.service.micro.FileMicroService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +52,7 @@ public class SellService {
     private final PurchaserRepository purchaserRepository;
     private final BrokerRepository brokerRepository;
 
-    public SellService(SellRepository sellRepository, BrokerService brokerService, PurchaserService purchaserService, CooperationRepository cooperationRepository, ApartmentRepository apartmentRepository, GarageRepository garageRepository, ParkingPlaceRepository parkingPlaceRepository, PaymentRepository paymentRepository, InstallmentRepository installmentRepository, ProjectRepository projectRepository, IncomeRepository incomeRepository, PurchaserRepository purchaserRepository, BrokerRepository brokerRepository) {
+    public SellService(SellRepository sellRepository, BrokerService brokerService, PurchaserService purchaserService, CooperationRepository cooperationRepository, ApartmentRepository apartmentRepository, GarageRepository garageRepository, ParkingPlaceRepository parkingPlaceRepository, PaymentRepository paymentRepository, InstallmentRepository installmentRepository, ProjectRepository projectRepository, IncomeRepository incomeRepository, PurchaserRepository purchaserRepository, BrokerRepository brokerRepository, FileMicroService microService) {
         this.sellRepository = sellRepository;
         this.brokerService = brokerService;
         this.purchaserService = purchaserService;
@@ -65,10 +66,12 @@ public class SellService {
         this.incomeRepository = incomeRepository;
         this.purchaserRepository = purchaserRepository;
         this.brokerRepository = brokerRepository;
+
     }
     @Transactional
-    public String createSell(Long id, CreateSellDTO createSellDTO) {
+    public String createSell(Long id, CreateSellDTO createSellDTO,String filePath) {
         Sell sell = new Sell();
+        sell.setFilePath(filePath);
         sell.setCooperationId(id);
         Payment payment = new Payment();
         sell.setPayment(payment);
