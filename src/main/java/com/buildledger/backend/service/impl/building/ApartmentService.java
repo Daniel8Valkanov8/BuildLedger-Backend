@@ -1,6 +1,7 @@
 package com.buildledger.backend.service.impl.building;
 
 import com.buildledger.backend.dto.request.building.CreateIntermediateDTO;
+import com.buildledger.backend.dto.request.sos.ResponseApartmentTableRowDTO;
 import com.buildledger.backend.dto.request.sos.UpdateApartmentDTO;
 import com.buildledger.backend.dto.responce.objects.ResponseApartmentDTO;
 import com.buildledger.backend.dto.responce.objects.ResponseApartmentInformationDTO;
@@ -13,6 +14,7 @@ import com.buildledger.backend.model.sos.Apartment;
 import com.buildledger.backend.model.sos.Floor;
 import com.buildledger.backend.repository.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -100,47 +102,48 @@ public class ApartmentService {
     }
 
     private void convertUpdateToEntity(UpdateApartmentDTO updateApartmentDTO, Apartment apartment1) {
-        if (updateApartmentDTO.getArea() != 0) {
+        if (updateApartmentDTO.getArea() != null) {
             apartment1.setArea(updateApartmentDTO.getArea());
         }
-        if (updateApartmentDTO.getFloorId() != 0) {
+        if (updateApartmentDTO.getFloorId() != null) {
             floorRepository.findById(updateApartmentDTO.getFloorId())
                     .ifPresent(apartment1::setFloor);
         }
-        if (updateApartmentDTO.getPriceEur() != 0) {
+        if (updateApartmentDTO.getPriceEur() != null) {
             apartment1.setPriceEur(updateApartmentDTO.getPriceEur());
         }
-        if (updateApartmentDTO.getBedroomCount() != 0) {
+        if (updateApartmentDTO.getBedroomCount() != null) {
             apartment1.setBedroomCount(updateApartmentDTO.getBedroomCount());
         }
-        if (updateApartmentDTO.getBathroomCount() != 0) {
+        if (updateApartmentDTO.getBathroomCount() != null) {
             apartment1.setBathroomCount(updateApartmentDTO.getBathroomCount());
         }
-        if (updateApartmentDTO.getCleanArea() != 0) {
+        if (updateApartmentDTO.getCleanArea() != null) {
             apartment1.setCleanArea(updateApartmentDTO.getCleanArea());
         }
-        if (updateApartmentDTO.getCommonPartsPercentage() != 0) {
+        if (updateApartmentDTO.getCommonPartsPercentage() != null) {
             apartment1.setCommonPartsPercentage(updateApartmentDTO.getCommonPartsPercentage());
         }
-        if (updateApartmentDTO.getCommonParts() != 0) {
+        if (updateApartmentDTO.getCommonParts() != null) {
             apartment1.setCommonParts(updateApartmentDTO.getCommonParts());
         }
-        if (updateApartmentDTO.getAdjoiningTerrace() != 0) {
+        if (updateApartmentDTO.getAdjoiningTerrace() != null) {
             apartment1.setAdjoiningTerrace(updateApartmentDTO.getAdjoiningTerrace());
         }
-        if (updateApartmentDTO.getAdjoiningYardRoof() != 0) {
+        if (updateApartmentDTO.getAdjoiningYardRoof() != null) {
             apartment1.setAdjoiningYardRoof(updateApartmentDTO.getAdjoiningYardRoof());
         }
         if (updateApartmentDTO.getCompensation() != null) {
             apartment1.setCompensation(updateApartmentDTO.getCompensation());
         }
-        if (updateApartmentDTO.getPricePerSquareMeter() != 0) {
+        if (updateApartmentDTO.getPricePerSquareMeter() != null) {
             apartment1.setPricePerSquareMeter(updateApartmentDTO.getPricePerSquareMeter());
         }
-        if (updateApartmentDTO.getPriceYard() != 0) {
+        if (updateApartmentDTO.getPriceYard() != null) {
             apartment1.setPriceYard(updateApartmentDTO.getPriceYard());
         }
     }
+
 
 
     private static void setFloorIdCatchNull(ResponseApartmentDTO responseApartmentDTO, Apartment savedApartment) {
@@ -158,7 +161,7 @@ public class ApartmentService {
     }
 
     public List<ResponseApartmentDTO> getAllFreeApartmentsByCooperationID(long id) {
-        List<Apartment> response = apartmentRepository.getAllFreeApartmentsByCooperationID(id);
+        List<Apartment> response = getApartmentsByCooperationId(id);
         List<ResponseApartmentDTO> responseDTO = new ArrayList<>();
         for (Apartment apartment : response) {
             ResponseApartmentDTO dto = new ResponseApartmentDTO();
@@ -167,6 +170,11 @@ public class ApartmentService {
             responseDTO.add(dto);
         }
         return responseDTO;
+    }
+
+    private List<Apartment> getApartmentsByCooperationId(long id) {
+        List<Apartment> response = apartmentRepository.getAllFreeApartmentsByCooperationID(id);
+        return response;
     }
 
     public ResponseApartmentInformationDTO getApartmentByCooperationIdAndApartmentId(long cooperationId, long apartmentId) {
@@ -250,4 +258,33 @@ public class ApartmentService {
 
     }
 
+    //todo
+    public List<ResponseApartmentTableRowDTO> getApartmentByCooperationIdInTable(long id) {
+        List<Apartment> apartments = apartmentRepository.getAllApartmentsByCooperationID(id);
+        List<ResponseApartmentTableRowDTO> response = convertFromApartments(apartments);
+        return response;
+    }
+
+    private List<ResponseApartmentTableRowDTO> convertFromApartments(List<Apartment> apartments) {
+        List<ResponseApartmentTableRowDTO> response = new ArrayList<>();
+        for (Apartment apartment : apartments) {
+            ResponseApartmentTableRowDTO row = new ResponseApartmentTableRowDTO();
+        BeanUtils.copyProperties(apartment,row);
+        if(apartment.isSold()){
+            Sell sell = apartment.getSell();
+            BeanUtils.copyProperties(sell,row);
+            Payment payment = sell.getPayment();
+            BeanUtils.copyProperties(payment,row);
+            row.setInstallmentsCount(payment.getInstallments().size());
+            for (Installment installment : payment.getInstallments()) {
+                row.getInstallments().add(installment.getInstallmentAmount());
+                }
+            row.setPurchaser(sell.getPurchaser().getFirstName()
+                    + " " + sell.getPurchaser().getLastName());
+            }
+
+        response.add(row);
+        }
+        return response;
+    }
 }

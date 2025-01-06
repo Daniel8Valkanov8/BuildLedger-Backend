@@ -1,5 +1,6 @@
 package com.buildledger.backend.controller.sos;
 
+import com.buildledger.backend.dto.request.sos.ResponseApartmentTableRowDTO;
 import com.buildledger.backend.dto.request.sos.UpdateApartmentDTO;
 import com.buildledger.backend.dto.responce.objects.ResponseApartmentDTO;
 import com.buildledger.backend.dto.responce.objects.ResponseApartmentInformationDTO;
@@ -48,7 +49,13 @@ public class ApartmentController {
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
+    //todo
+    @GetMapping("/{id}/table")
+    public ResponseEntity<List<ResponseApartmentTableRowDTO>> getAllApartmentByCooperationIdInTable(@PathVariable long id) {
+        List<ResponseApartmentTableRowDTO> response = apartmentService.getApartmentByCooperationIdInTable(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
+    }
 
     @PutMapping("/update")
     public ResponseEntity<ResponseApartmentDTO> updateApartment(@RequestBody UpdateApartmentDTO updateApartmentDTO) {

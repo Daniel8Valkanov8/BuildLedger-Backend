@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class CreateSellDTO {
     private double discountInEuro;
     private double totalPriceInEuro;
-
+    private double contractPriceInEuro;
     private String paymentSchema;  // paymentSchemaId -> paymentSchema
     private InstallmentAndDate[] installmentAndDates; // installments -> installmentAndDates
     private SelfContainedUnits[] selfContainedUnits;
@@ -33,6 +33,14 @@ public class CreateSellDTO {
     private String brokerLastName;
     private String brokerEmail;
     private String description;
+
+    public double getContractPriceInEuro() {
+        return contractPriceInEuro;
+    }
+
+    public void setContractPriceInEuro(double contractPriceInEuro) {
+        this.contractPriceInEuro = contractPriceInEuro;
+    }
 
     public double getDiscountInEuro() {
         return discountInEuro;

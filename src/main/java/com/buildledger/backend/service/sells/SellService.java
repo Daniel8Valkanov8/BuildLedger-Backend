@@ -8,10 +8,12 @@ import com.buildledger.backend.dto.request.sell.ResponseSellForEditDTO;
 import com.buildledger.backend.dto.request.sell.UpdateInstallmentsSellDTO;
 import com.buildledger.backend.dto.responce.PurchaserDTO;
 import com.buildledger.backend.dto.responce.sell.ResponseSellDTO;
+import com.buildledger.backend.enums.ExpenseStatus;
 import com.buildledger.backend.enums.PaymentStatus;
 import com.buildledger.backend.model.Project;
 import com.buildledger.backend.model.building.Cooperation;
 import com.buildledger.backend.enums.PayStatus;
+import com.buildledger.backend.model.ledger.accounting.Expense;
 import com.buildledger.backend.model.ledger.accounting.Income;
 import com.buildledger.backend.model.ledger.Installment;
 import com.buildledger.backend.model.ledger.Payment;
@@ -26,6 +28,7 @@ import com.buildledger.backend.service.impl.BrokerService;
 import com.buildledger.backend.service.impl.PurchaserService;
 import com.buildledger.backend.service.micro.FileMicroService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +54,9 @@ public class SellService {
     private final IncomeRepository incomeRepository;
     private final PurchaserRepository purchaserRepository;
     private final BrokerRepository brokerRepository;
+    private final ExpenseRepository expenseRepository;
 
-    public SellService(SellRepository sellRepository, BrokerService brokerService, PurchaserService purchaserService, CooperationRepository cooperationRepository, ApartmentRepository apartmentRepository, GarageRepository garageRepository, ParkingPlaceRepository parkingPlaceRepository, PaymentRepository paymentRepository, InstallmentRepository installmentRepository, ProjectRepository projectRepository, IncomeRepository incomeRepository, PurchaserRepository purchaserRepository, BrokerRepository brokerRepository, FileMicroService microService) {
+    public SellService(SellRepository sellRepository, BrokerService brokerService, PurchaserService purchaserService, CooperationRepository cooperationRepository, ApartmentRepository apartmentRepository, GarageRepository garageRepository, ParkingPlaceRepository parkingPlaceRepository, PaymentRepository paymentRepository, InstallmentRepository installmentRepository, ProjectRepository projectRepository, IncomeRepository incomeRepository, PurchaserRepository purchaserRepository, BrokerRepository brokerRepository, FileMicroService microService, ExpenseRepository expenseRepository) {
         this.sellRepository = sellRepository;
         this.brokerService = brokerService;
         this.purchaserService = purchaserService;
@@ -67,6 +71,7 @@ public class SellService {
         this.purchaserRepository = purchaserRepository;
         this.brokerRepository = brokerRepository;
 
+        this.expenseRepository = expenseRepository;
     }
     @Transactional
     public String createSell(Long id, CreateSellDTO createSellDTO,String filePath) {
@@ -111,34 +116,54 @@ public class SellService {
             paymentRepository.saveAndFlush(savedPayment);
 
 
-            Income income = new Income();
-            String incomeLog =  log+ " " + StaticService.convertObjectsToString(savedSell);
-            income.setIncomeLog(incomeLog);
-            income.setDate(installmentAndDate.getDate());
-            income.setAmountEuro(installmentAndDate.getSumInEuros());
-            income.setPayStatus(PayStatus.NO);
-            income.setInstallment(installment);
-            Cooperation cooperation = cooperationRepository.findById(id).get();
-            income.setBuilding(cooperation);
-            Project project = projectRepository.findByBuildingId(id);
-            income.setProject(project);
-            income.setPayedAmountEuro(0);
-            income.setRemainingAmountEuro(installmentAndDate.getSumInEuros());
-
-            Cooperation cooperationForAddSell = cooperationRepository.findById(id).get();
-            cooperationForAddSell.getSells().add(savedSell);
-            Income savedIncome = incomeRepository.saveAndFlush(income);
-            cooperationForAddSell.getIncomes().add(savedIncome);
-            savedInstallment.setIncome(savedIncome);
-            installmentRepository.saveAndFlush(savedInstallment);
-            cooperationRepository.saveAndFlush(cooperationForAddSell);
-            projectRepository.saveAndFlush(project);
+            createIncomes(id, installmentAndDate, log, savedSell, installment, savedInstallment);
 
         }
-
+        expenseCreate(createSellDTO);
         savedSell.setPayment(savedPayment);
         sellRepository.saveAndFlush(savedSell);
         return "Success";
+    }
+
+    // todo @Async
+    private void expenseCreate(CreateSellDTO createSellDTO) {
+        if(createSellDTO.getBrokerFirstName()!=null&& createSellDTO.getBrokerLastName()!=null&& createSellDTO.getBrokerEmail()!=null){
+            Expense expense = new Expense();
+            expense.setCategory("Broker-Commission");
+            expense.setDate(createSellDTO.getContractDate());
+            expense.setAmountEuro(createSellDTO.getBrokerProfitInEuro());
+            expense.setPayedAmountEuro(0);
+            expense.setRemainingAmountEuro(createSellDTO.getBrokerProfitInEuro());
+            expense.setExpenseStatus(ExpenseStatus.WORK);
+            expenseRepository.saveAndFlush(expense);
+
+        }
+    }
+
+    private void createIncomes(Long id, InstallmentAndDate installmentAndDate, String log, Sell savedSell, Installment installment, Installment savedInstallment) {
+        Income income = new Income();
+        String incomeLog =  log + " " + StaticService.convertObjectsToString(savedSell);
+        income.setIncomeLog(incomeLog);
+        income.setDate(installmentAndDate.getDate());
+        income.setAmountEuro(installmentAndDate.getSumInEuros());
+        income.setPayStatus(PayStatus.NO);
+        income.setInstallment(installment);
+        Cooperation cooperation = cooperationRepository.findById(id).get();
+        income.setBuilding(cooperation);
+        Project project = projectRepository.findByBuildingId(id);
+        income.setProject(project);
+        income.setPayedAmountEuro(0);
+        income.setRemainingAmountEuro(installmentAndDate.getSumInEuros());
+
+        Cooperation cooperationForAddSell = cooperationRepository.findById(id).get();
+        cooperationForAddSell.getSells().add(savedSell);
+        Income savedIncome = incomeRepository.saveAndFlush(income);
+        cooperationForAddSell.getIncomes().add(savedIncome);
+        savedInstallment.setIncome(savedIncome);
+        installmentRepository.saveAndFlush(savedInstallment);
+        cooperationRepository.saveAndFlush(cooperationForAddSell);
+        projectRepository.saveAndFlush(project);
+
     }
 
     private void addObjectsInSell(CreateSellDTO createSellDTO, Sell sell) {
@@ -182,6 +207,7 @@ public class SellService {
         sell.setPurchaser(purchaser);
         //sell.setFilePath(filePath);
         sell.setTotalPriceInEuro(createSellDTO.getTotalPriceInEuro());
+        sell.setContractPriceInEuro(createSellDTO.getContractPriceInEuro());
         sell.setDiscountInEuro(createSellDTO.getDiscountInEuro());
         sell.setBrokerProfitInEuro(createSellDTO.getBrokerProfitInEuro());
         sell.setBrokerProfitInPercentage(createSellDTO.getBrokerProfitInPercentage());

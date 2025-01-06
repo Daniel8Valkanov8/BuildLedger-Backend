@@ -15,7 +15,19 @@ import java.util.Set;
 public abstract class Person extends BaseEntity {
 
 
+    public Person(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
 
+    public Person(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public Person() {
+    }
 
     private String firstName;
     private String lastName;

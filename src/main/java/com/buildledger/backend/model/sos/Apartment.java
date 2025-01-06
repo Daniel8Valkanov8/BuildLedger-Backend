@@ -15,7 +15,7 @@ import java.util.Set;
 public class Apartment extends Sos{
 
     private double area;
-    private boolean sold;
+
     private String description;
     private int bedroomCount;
     private int bathroomCount;
@@ -119,13 +119,6 @@ public class Apartment extends Sos{
         this.area = area;
     }
 
-    public boolean isSold() {
-        return sold;
-    }
-
-    public void setSold(boolean sold) {
-        this.sold = sold;
-    }
 
     public String getDescription() {
         return description;

@@ -6,110 +6,42 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UpdateApartmentDTO {
-
-    private long id;
-    private long cooperationId;
+    private Long id; // Long вместо long
+    private Long cooperationId;
     private String number;
-    private double area;
+    private Double area; // Double вместо double
 
-    private double cleanArea;
-    private double commonPartsPercentage;
-    private double commonParts;
-    private double adjoiningTerrace;
-    private double adjoiningYardRoof;
+    private Double cleanArea;
+    private Double commonPartsPercentage;
+    private Double commonParts;
+    private Double adjoiningTerrace;
+    private Double adjoiningYardRoof;
     private String compensation;
-    private double pricePerSquareMeter;
-    private double priceYard;
+    private Double pricePerSquareMeter;
+    private Double priceYard;
 
-    private int bedroomCount;
-    private int bathroomCount;
-    private long floorId;
-    private double priceEur;
+    private Integer bedroomCount; // Integer вместо int
+    private Integer bathroomCount;
+    private Long floorId;
+    private Double priceEur;
 
-
-    public double getCleanArea() {
-        return cleanArea;
-    }
-
-    public void setCleanArea(double cleanArea) {
-        this.cleanArea = cleanArea;
-    }
-
-    public double getCommonPartsPercentage() {
-        return commonPartsPercentage;
-    }
-
-    public double getPriceYard() {
-        return priceYard;
-    }
-
-    public void setPriceYard(double priceYard) {
-        this.priceYard = priceYard;
-    }
-
-    public void setCommonPartsPercentage(double commonPartsPercentage) {
-        this.commonPartsPercentage = commonPartsPercentage;
-    }
-
-    public double getCommonParts() {
-        return commonParts;
-    }
-
-    public void setCommonParts(double commonParts) {
-        this.commonParts = commonParts;
-    }
-
-    public double getAdjoiningTerrace() {
-        return adjoiningTerrace;
-    }
-
-    public void setAdjoiningTerrace(double adjoiningTerrace) {
-        this.adjoiningTerrace = adjoiningTerrace;
-    }
-
-    public double getAdjoiningYardRoof() {
-        return adjoiningYardRoof;
-    }
-
-    public void setAdjoiningYardRoof(double adjoiningYardRoof) {
-        this.adjoiningYardRoof = adjoiningYardRoof;
-    }
-
-    public String getCompensation() {
-        return compensation;
-    }
-
-    public void setCompensation(String compensation) {
-        this.compensation = compensation;
-    }
-
-    public double getPricePerSquareMeter() {
-        return pricePerSquareMeter;
-    }
-
-    public void setPricePerSquareMeter(double pricePerSquareMeter) {
-        this.pricePerSquareMeter = pricePerSquareMeter;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getCooperationId() {
+    public Long getCooperationId() {
         return cooperationId;
     }
 
-    public void setCooperationId(long cooperationId) {
+    public void setCooperationId(Long cooperationId) {
         this.cooperationId = cooperationId;
     }
 
@@ -121,43 +53,109 @@ public class UpdateApartmentDTO {
         this.number = number;
     }
 
-    public double getArea() {
+    public Double getArea() {
         return area;
     }
 
-    public void setArea(double area) {
+    public void setArea(Double area) {
         this.area = area;
     }
 
-    public int getBedroomCount() {
+    public Double getCleanArea() {
+        return cleanArea;
+    }
+
+    public void setCleanArea(Double cleanArea) {
+        this.cleanArea = cleanArea;
+    }
+
+    public Double getCommonPartsPercentage() {
+        return commonPartsPercentage;
+    }
+
+    public void setCommonPartsPercentage(Double commonPartsPercentage) {
+        this.commonPartsPercentage = commonPartsPercentage;
+    }
+
+    public Double getCommonParts() {
+        return commonParts;
+    }
+
+    public void setCommonParts(Double commonParts) {
+        this.commonParts = commonParts;
+    }
+
+    public Double getAdjoiningTerrace() {
+        return adjoiningTerrace;
+    }
+
+    public void setAdjoiningTerrace(Double adjoiningTerrace) {
+        this.adjoiningTerrace = adjoiningTerrace;
+    }
+
+    public Double getAdjoiningYardRoof() {
+        return adjoiningYardRoof;
+    }
+
+    public void setAdjoiningYardRoof(Double adjoiningYardRoof) {
+        this.adjoiningYardRoof = adjoiningYardRoof;
+    }
+
+    public String getCompensation() {
+        return compensation;
+    }
+
+    public void setCompensation(String compensation) {
+        this.compensation = compensation;
+    }
+
+    public Double getPricePerSquareMeter() {
+        return pricePerSquareMeter;
+    }
+
+    public void setPricePerSquareMeter(Double pricePerSquareMeter) {
+        this.pricePerSquareMeter = pricePerSquareMeter;
+    }
+
+    public Double getPriceYard() {
+        return priceYard;
+    }
+
+    public void setPriceYard(Double priceYard) {
+        this.priceYard = priceYard;
+    }
+
+    public Integer getBedroomCount() {
         return bedroomCount;
     }
 
-    public void setBedroomCount(int bedroomCount) {
+    public void setBedroomCount(Integer bedroomCount) {
         this.bedroomCount = bedroomCount;
     }
 
-    public int getBathroomCount() {
+    public Integer getBathroomCount() {
         return bathroomCount;
     }
 
-    public void setBathroomCount(int bathroomCount) {
+    public void setBathroomCount(Integer bathroomCount) {
         this.bathroomCount = bathroomCount;
     }
 
-    public long getFloorId() {
+    public Long getFloorId() {
         return floorId;
     }
 
-    public void setFloorId(long floorId) {
+    public void setFloorId(Long floorId) {
         this.floorId = floorId;
     }
 
-    public double getPriceEur() {
+    public Double getPriceEur() {
         return priceEur;
     }
 
-    public void setPriceEur(double priceEur) {
+    public void setPriceEur(Double priceEur) {
         this.priceEur = priceEur;
     }
 }
+
+

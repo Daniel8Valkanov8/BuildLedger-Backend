@@ -32,6 +32,16 @@ public class ProjectService {
     }
 
 
+    public String deleteProjectById(Long id) {
+        if (projectRepository.existsById(id)) {
+            projectRepository.deleteById(id);
+            return "Проектът с ID " + id + " беше успешно изтрит.";
+        } else {
+            return "Проектът с ID " + id + " не беше намерен.";
+        }
+    }
+
+
     public ResponseNewProjectDTO createNewProject(CreateNewProjectDTO newProjectDTO) {
         Project project = new Project();
         project.setTitle(newProjectDTO.getTitle());

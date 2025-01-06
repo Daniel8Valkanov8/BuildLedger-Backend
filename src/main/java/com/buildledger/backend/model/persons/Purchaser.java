@@ -14,8 +14,15 @@ import java.util.Set;
 @Getter
 @Setter
 public class Purchaser extends Person {
+    public Purchaser(String firstName, String lastName) {
+        super(firstName, lastName);
+    }
+    public Purchaser() {
+        super();
+    }
 
     private final String type = "purchaser";
+
 
     @OneToMany(mappedBy = "purchaser", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Sell> sells;

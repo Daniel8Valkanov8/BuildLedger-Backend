@@ -25,6 +25,7 @@ public class Sell extends BaseEntity {
 
     private double discountInEuro;
     private double totalPriceInEuro;
+    private double contractPriceInEuro;
     private double brokerProfitInEuro;
     private double brokerProfitInPercentage;
 
@@ -72,6 +73,14 @@ public class Sell extends BaseEntity {
 
     public Long getCooperationId() {
         return cooperationId;
+    }
+
+    public double getContractPriceInEuro() {
+        return contractPriceInEuro;
+    }
+
+    public void setContractPriceInEuro(double contractPriceInEuro) {
+        this.contractPriceInEuro = contractPriceInEuro;
     }
 
     public void setCooperationId(Long cooperationId) {

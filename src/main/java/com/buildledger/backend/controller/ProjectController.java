@@ -6,6 +6,7 @@ import com.buildledger.backend.dto.responce.building.ResponseByIdProjectDTO;
 import com.buildledger.backend.dto.responce.building.ResponseNewProjectDTO;
 import com.buildledger.backend.service.impl.ProjectService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,11 @@ public class ProjectController {
         return ResponseEntity.ok(projectTitle);
     }
 
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<String> deleteProjectById(@PathVariable Long id){
+        String response = projectService.deleteProjectById(id);
+        return new ResponseEntity<String>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<ResponseNewProjectDTO>> getAllProjects() {
