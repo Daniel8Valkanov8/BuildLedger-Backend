@@ -9,14 +9,21 @@ import com.buildledger.backend.model.building.Cooperation;
 import com.buildledger.backend.model.ledger.Installment;
 import com.buildledger.backend.model.ledger.Payment;
 import com.buildledger.backend.model.ledger.Sell;
-import com.buildledger.backend.model.ledger.accounting.Income;
+
 import com.buildledger.backend.model.sos.Apartment;
-import com.buildledger.backend.model.sos.Floor;
+
 import com.buildledger.backend.repository.*;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -258,7 +265,7 @@ public class ApartmentService {
 
     }
 
-    //todo
+
     public List<ResponseApartmentTableRowDTO> getApartmentByCooperationIdInTable(long id) {
         List<Apartment> apartments = apartmentRepository.getAllApartmentsByCooperationID(id);
         List<ResponseApartmentTableRowDTO> response = convertFromApartments(apartments);
@@ -287,4 +294,22 @@ public class ApartmentService {
         }
         return response;
     }
+
+    public Resource getContract(long apartmentId) throws IOException {
+        Apartment apartment = apartmentRepository.findById(apartmentId).orElse(null);
+        if (apartment != null && apartment.isSold()) {
+            String filePath = apartment.getSell().getFilePath();
+            System.out.println("File path: " + filePath);
+
+            Path path = Paths.get(filePath).toAbsolutePath(); // Use Paths to handle file paths correctly
+            if (Files.exists(path)) { // Use Files.exists for reliable file existence check
+                return new UrlResource(path.toUri());
+            } else {
+                System.err.println("File does not exist: " + filePath);
+            }
+        }
+        return null; // No file if the apartment is not sold or file not found
+    }
+
+
 }

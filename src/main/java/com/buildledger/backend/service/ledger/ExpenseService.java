@@ -62,7 +62,7 @@ public class ExpenseService {
        }else if(createExpenseDTO.getStatus().equals("OTHER")){
            expense.setExpenseStatus(ExpenseStatus.OTHER);
        }
-        expense.setProject(buildingRepository.findById(id).get().getParcel().getProject());
+       expense.setProject(buildingRepository.findById(id).get().getParcel().getProject());
        expense.setAmountEuro(createExpenseDTO.getAmountEuro());
        expense.setPayedAmountEuro(createExpenseDTO.getPaid());
        double remaining = createExpenseDTO.getAmountEuro()-createExpenseDTO.getPaid();

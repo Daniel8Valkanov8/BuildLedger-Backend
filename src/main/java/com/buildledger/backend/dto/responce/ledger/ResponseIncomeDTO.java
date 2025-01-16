@@ -18,6 +18,25 @@ public class ResponseIncomeDTO {
     private PayStatus payStatus;
     private double payedAmountEuro;
     private double remainingAmountEuro;
+    private String factureNumber;
+    private String incomeStatus;
+
+    public String getFactureNumber() {
+        return factureNumber;
+    }
+
+    public void setFactureNumber(String factureNumber) {
+        this.factureNumber = factureNumber;
+    }
+
+    public String getIncomeStatus() {
+        return incomeStatus;
+    }
+
+    public void setIncomeStatus(String incomeStatus) {
+        this.incomeStatus = incomeStatus;
+    }
+
     private String log;
 
     public long getId() {

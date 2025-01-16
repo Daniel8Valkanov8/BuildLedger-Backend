@@ -2,8 +2,10 @@ package com.buildledger.backend.service.ledger;
 
 
 import com.buildledger.backend.dto.request.ledger.AddAmountDTO;
+import com.buildledger.backend.dto.request.ledger.CreateExpenseDTO;
 import com.buildledger.backend.dto.responce.ResponseMainIncomeDTO;
 import com.buildledger.backend.dto.responce.ledger.ResponseIncomeDTO;
+import com.buildledger.backend.enums.ExpenseStatus;
 import com.buildledger.backend.enums.PayStatus;
 import com.buildledger.backend.enums.PaymentStatus;
 import com.buildledger.backend.model.building.Cooperation;
@@ -11,6 +13,7 @@ import com.buildledger.backend.model.ledger.Installment;
 import com.buildledger.backend.model.ledger.Payment;
 import com.buildledger.backend.model.ledger.accounting.Income;
 import com.buildledger.backend.model.ledger.accounting.Transaction;
+import com.buildledger.backend.repository.CooperationRepository;
 import com.buildledger.backend.repository.InstallmentRepository;
 import com.buildledger.backend.service.micro.MicroCooperationService;
 import org.springframework.beans.BeanUtils;
@@ -29,13 +32,15 @@ public class IncomeService {
     private final MicroCooperationService microCooperationService;
     private final TransactionService transactionService;
     private final InstallmentRepository installmentRepository;
+    private final CooperationRepository buildingRepository;
 
 
-    public IncomeService(IncomeRepository incomeRepository, MicroCooperationService microCooperationService, TransactionService transactionService, InstallmentRepository installmentRepository) {
+    public IncomeService(IncomeRepository incomeRepository, MicroCooperationService microCooperationService, TransactionService transactionService, InstallmentRepository installmentRepository, CooperationRepository buildingRepository) {
         this.incomeRepository = incomeRepository;
         this.microCooperationService = microCooperationService;
         this.transactionService = transactionService;
         this.installmentRepository = installmentRepository;
+        this.buildingRepository = buildingRepository;
     }
 
 
@@ -57,6 +62,8 @@ public class IncomeService {
         response.setPayedAmountEuro(income.getPayedAmountEuro());
         response.setRemainingAmountEuro(income.getRemainingAmountEuro());
         response.setLog(income.getIncomeLog());
+        response.setFactureNumber(income.getFactureNumber());
+        response.setIncomeStatus(income.getIncomeStatus());
         return response;
     }
 
@@ -121,6 +128,57 @@ public class IncomeService {
             response.add(responseMainIncomeDTO);
         }
         return response;
+    }
+
+    public String createIncomeInCooperation(Long id, CreateExpenseDTO createIncome) {
+
+        Income income = new Income();
+        Cooperation cooperation = buildingRepository.findById(id).get();
+        income.setBuilding(cooperation);
+        Income firstIncome = incomeRepository.saveAndFlush(income);
+        cooperation.getIncomes().add(firstIncome);
+
+        if (createIncome.getFactureNumber()!=null) {
+            income.setFactureNumber(createIncome.getFactureNumber());
+        }
+        income.setIncomeLog(createIncome.getTitle());
+
+        if(!createIncome.getStatus().isEmpty()){
+            income.setIncomeStatus(createIncome.getStatus());
+        }
+        income.setProject(buildingRepository.findById(id).get().getParcel().getProject());
+        income.setAmountEuro(createIncome.getAmountEuro());
+        income.setPayedAmountEuro(createIncome.getPaid());
+        double remaining = createIncome.getAmountEuro()-createIncome.getPaid();
+        System.out.println(remaining);
+        income.setRemainingAmountEuro(remaining);
+        income.setPayStatus(createIncome.getPayStatus());
+        income.setDate(createIncome.getPaymentDate());
+        income.setIncomeStatus(createIncome.getStatus());
+        Income savedIncome = incomeRepository.saveAndFlush(income);
+        if(createIncome.getPaid()>0){
+            Transaction transaction = transactionService.createIncomeTransaction(savedIncome.getBuilding(),
+                    savedIncome, createIncome.getPaid(), savedIncome.getPayStatus());
+            cooperation.getTransactions().add(transaction);
+        }
+        Cooperation savedCooperation = buildingRepository.saveAndFlush(cooperation);
+        return "Income created successfully";
+
+    }
+
+    public String deleteIncome(Long id) {
+        Income income = incomeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Income not found with ID: " + id));
+
+        if (income.getInstallment() != null) {
+            throw new IllegalStateException(
+                    "Cannot delete income with ID: " + id + ". It is linked to an installment. " +
+                            "Consider deleting the associated installment or modifying the payment scheme."
+            );
+        }
+
+        incomeRepository.deleteById(id);
+        return "Income deleted successfully";
     }
 
 }

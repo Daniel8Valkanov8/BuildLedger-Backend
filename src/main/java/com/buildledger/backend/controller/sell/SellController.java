@@ -63,7 +63,7 @@ public class SellController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping("/{id}/delete-sell")
-    public ResponseEntity<String> deleteSellbyId(@PathVariable("id") Long sellId) {
+    public ResponseEntity<String> deleteSellById(@PathVariable("id") Long sellId) {
         if (sellId == null) {
             return ResponseEntity.badRequest().body("Sell ID cannot be null");
         }

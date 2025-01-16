@@ -15,6 +15,24 @@ public class ResponseMainIncomeDTO {
     private String log;
     private String project;
     private String cooperation;
+    private String factureNumber;
+    private String incomeStatus;
+
+    public String getFactureNumber() {
+        return factureNumber;
+    }
+
+    public void setFactureNumber(String factureNumber) {
+        this.factureNumber = factureNumber;
+    }
+
+    public String getIncomeStatus() {
+        return incomeStatus;
+    }
+
+    public void setIncomeStatus(String incomeStatus) {
+        this.incomeStatus = incomeStatus;
+    }
 
     public long getId() {
         return id;

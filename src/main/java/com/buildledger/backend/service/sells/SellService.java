@@ -143,6 +143,7 @@ public class SellService {
     private void createIncomes(Long id, InstallmentAndDate installmentAndDate, String log, Sell savedSell, Installment installment, Installment savedInstallment) {
         Income income = new Income();
         String incomeLog =  log + " " + StaticService.convertObjectsToString(savedSell);
+        income.setIncomeStatus("Sell");
         income.setIncomeLog(incomeLog);
         income.setDate(installmentAndDate.getDate());
         income.setAmountEuro(installmentAndDate.getSumInEuros());

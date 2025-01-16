@@ -1,7 +1,8 @@
 spring:
   application:
     name: BuildLedger
-
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
 
 
   datasource:
@@ -18,6 +19,19 @@ server:
   port: 8080
 
 management:
+  metrics:
+    enabled: true
   endpoints:
     enabled-by-default: true
+    web:
+      exposure:
+        include:
+          - health
+          - metrics
+      base-path: /actuator
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      show-details: always
 

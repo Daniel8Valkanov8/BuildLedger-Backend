@@ -6,6 +6,7 @@ import com.buildledger.backend.enums.MyTransactionStatus;
 import com.buildledger.backend.enums.PayStatus;
 import com.buildledger.backend.model.building.Building;
 import com.buildledger.backend.model.building.Cooperation;
+import com.buildledger.backend.model.ledger.Payment;
 import com.buildledger.backend.model.ledger.Sell;
 import com.buildledger.backend.model.ledger.accounting.Expense;
 import com.buildledger.backend.model.ledger.accounting.Income;
@@ -35,18 +36,32 @@ public class TransactionService {
     }
 
 
-    public Transaction createIncomeTransaction(Cooperation cooperation, Income income, double amountForAdd, PayStatus payStatus) {
+    public Transaction createIncomeTransaction(Building cooperation, Income income, double amountForAdd, PayStatus payStatus) throws NullPointerException {
         LocalDate currentDate = LocalDate.now();
         Transaction transaction = initTransactionByIncome(cooperation, income, amountForAdd, payStatus, currentDate);
 
-        Sell sell = income.getInstallment().getPayment().getSell();
-        StringBuilder sellLog = initIncomeSellLog(sell);
+        try {
+            if (income.getInstallment() != null) {
+                Payment payment = income.getInstallment().getPayment();
+                if (payment != null) {
+                    Sell sell = payment.getSell();
+                    StringBuilder sellLog = initIncomeSellLog(sell);
+                    transaction.setTransactionStatus(MyTransactionStatus.INCOME);
+                    transaction.setTransactionLog("Income transaction by installment: " + income.getIncomeLog() + " Sell: " + sellLog.toString());
+                } else {
+                    transaction.setTransactionLog("Income transaction by installment: " + income.getIncomeLog() + " Sell: No associated sell");
+                }
+            } else {
+                transaction.setTransactionLog("Income: " + income.toString());
+            }
+        } catch (NullPointerException e) {
+            transaction.setTransactionLog("Income: " + income.toString() + " (Installment or Payment was null)");
+        }
 
-        transaction.setTransactionStatus(MyTransactionStatus.INCOME);
-        transaction.setTransactionLog("Income transaction by installment: " + income.getIncomeLog() + " Sell: " + sellLog.toString());
         Transaction savedTransaction = transactionRepository.saveAndFlush(transaction);
         return savedTransaction;
     }
+
 
 
     public Transaction createExpenseTransaction(Building cooperation, Expense expense,
@@ -63,7 +78,7 @@ public class TransactionService {
         transaction.setDate(currentDate);
 
 
-        //todo sell log
+
         transaction.setTransactionStatus(MyTransactionStatus.EXPENSE);
         transaction.setTransactionLog("Expense: " + expense.toString());
         Transaction savedTransaction = transactionRepository.saveAndFlush(transaction);
@@ -91,7 +106,7 @@ public class TransactionService {
     }
 
 
-    private static Transaction initTransactionByIncome(Cooperation cooperation, Income income, double amountForAdd, PayStatus payStatus, LocalDate currentDate) {
+    private static Transaction initTransactionByIncome(Building cooperation, Income income, double amountForAdd, PayStatus payStatus, LocalDate currentDate) {
         Transaction transaction = new Transaction();
 
         transaction.setBuilding(cooperation);
@@ -99,6 +114,7 @@ public class TransactionService {
         transaction.setAmountEuro(income.getAmountEuro());
         transaction.setRemainingAmountEuro(income.getRemainingAmountEuro());
         transaction.setPayStatus(payStatus);
+        transaction.setTransactionStatus(MyTransactionStatus.INCOME);
         transaction.setDate(currentDate);
         return transaction;
     }

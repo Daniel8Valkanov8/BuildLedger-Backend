@@ -1,5 +1,6 @@
 package com.buildledger.backend.model.ledger.accounting;
 
+import com.buildledger.backend.enums.ExpenseStatus;
 import com.buildledger.backend.model.Project;
 import com.buildledger.backend.model.building.Building;
 import com.buildledger.backend.model.ledger.Installment;
@@ -13,6 +14,11 @@ import lombok.Setter;
 public class Income extends BaseLedger {
 
         private String incomeLog;
+        private String incomeStatus;
+
+        @Column(nullable = true)
+        private String factureNumber;
+
         @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
         @JoinColumn(name = "installment_id")
         private Installment installment;
@@ -24,6 +30,22 @@ public class Income extends BaseLedger {
         @ManyToOne
         @JoinColumn(name = "project_id")
         private Project project;
+
+        public String getIncomeStatus() {
+                return incomeStatus;
+        }
+
+        public void setIncomeStatus(String incomeStatus) {
+                this.incomeStatus = incomeStatus;
+        }
+
+        public String getFactureNumber() {
+                return factureNumber;
+        }
+
+        public void setFactureNumber(String factureNumber) {
+                this.factureNumber = factureNumber;
+        }
 
         public String getIncomeLog() {
                 return incomeLog;
@@ -55,5 +77,19 @@ public class Income extends BaseLedger {
 
         public void setProject(Project project) {
                 this.project = project;
+        }
+
+        @Override
+        public String toString() {
+                StringBuilder sb = new StringBuilder();
+                sb.append(incomeLog);
+                sb.append(" - ");
+                sb.append(incomeStatus.toString());
+                if (this.factureNumber != null) {
+                        sb.append(" - ");
+                        sb.append(factureNumber);
+                }
+
+                return sb.toString();
         }
 }

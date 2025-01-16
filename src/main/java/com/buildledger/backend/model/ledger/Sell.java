@@ -29,6 +29,7 @@ public class Sell extends BaseEntity {
     private double brokerProfitInEuro;
     private double brokerProfitInPercentage;
 
+    //todo remove
     @ManyToOne
     @JoinColumn(name = "building_id")
     private Building building;

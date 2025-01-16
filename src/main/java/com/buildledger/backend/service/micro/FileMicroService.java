@@ -76,31 +76,32 @@ public class FileMicroService {
     //}
     public String saveFileToContracts(MultipartFile file) {
         try {
-            // Get the absolute path to the target directory
-            String basePath = System.getProperty("user.dir"); // Or another known directory
+            // Получаване на абсолютния път до целевата директория
+            String basePath = System.getProperty("user.dir"); // Работната директория на проекта
             Path contractsDir = Paths.get(basePath, "src/main/resources/contracts");
 
-            // Create the directory if it doesn't exist
+            // Създаване на директорията, ако не съществува
             if (!Files.exists(contractsDir)) {
                 Files.createDirectories(contractsDir);
             }
 
-            // Generate a unique filename
+            // Генериране на уникално име за файла
             String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
             String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
 
-            // Full path to the file
+            // Пълен път до файла
             Path destinationPath = contractsDir.resolve(uniqueFileName);
 
-            // Save the file
+            // Запазване на файла
             file.transferTo(destinationPath.toFile());
 
-            // Return the relative path
-            return "resources/contracts/" + uniqueFileName;
+            // Връщане на абсолютния път до файла
+            return destinationPath.toAbsolutePath().toString();
 
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error saving file to contracts directory", e);
         }
     }
+
 }

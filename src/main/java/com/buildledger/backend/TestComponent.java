@@ -5,7 +5,7 @@ import com.buildledger.backend.service.impl.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+
 public class TestComponent {
 
     private final ProjectService projectService;

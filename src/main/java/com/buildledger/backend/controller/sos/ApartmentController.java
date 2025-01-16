@@ -5,10 +5,13 @@ import com.buildledger.backend.dto.request.sos.UpdateApartmentDTO;
 import com.buildledger.backend.dto.responce.objects.ResponseApartmentDTO;
 import com.buildledger.backend.dto.responce.objects.ResponseApartmentInformationDTO;
 import com.buildledger.backend.service.impl.building.ApartmentService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -49,7 +52,26 @@ public class ApartmentController {
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
-    //todo
+
+    @GetMapping("/apartment-get-contract/{apartmentId}/file")
+    public ResponseEntity<Resource> getContractOfApartment(@PathVariable long apartmentId) {
+        try {
+            Resource resource = apartmentService.getContract(apartmentId);
+            if (resource != null) {
+                String fileName = resource.getFilename() != null ? resource.getFilename() : "downloaded-file";
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                        .body(resource);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
     @GetMapping("/{id}/table")
     public ResponseEntity<List<ResponseApartmentTableRowDTO>> getAllApartmentByCooperationIdInTable(@PathVariable long id) {
         List<ResponseApartmentTableRowDTO> response = apartmentService.getApartmentByCooperationIdInTable(id);
