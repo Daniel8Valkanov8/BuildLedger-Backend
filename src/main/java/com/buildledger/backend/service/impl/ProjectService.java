@@ -45,6 +45,7 @@ public class ProjectService {
     public ResponseNewProjectDTO createNewProject(CreateNewProjectDTO newProjectDTO) {
         Project project = new Project();
         project.setTitle(newProjectDTO.getTitle());
+        project.setCompanyName(newProjectDTO.getCompanyName());
         project.setEik(newProjectDTO.getEik());
         project.setStartDate(newProjectDTO.getStartDate());
         project.setEndDate(newProjectDTO.getEndDate());
@@ -61,6 +62,7 @@ public class ProjectService {
         ResponseNewProjectDTO response = new ResponseNewProjectDTO();
         response.setId(savedProject.getId());
         response.setTitle(savedProject.getTitle());
+        response.setCompanyName(savedProject.getCompanyName());
         response.setEik(savedProject.getEik());
         response.setStartDate(savedProject.getStartDate());
         response.setEndDate(savedProject.getEndDate());
@@ -88,7 +90,9 @@ public class ProjectService {
 
     public List<ResponseNewProjectDTO> getAllProjects() {
         return projectRepository.findAll().stream()
-                .map(project -> new ResponseNewProjectDTO(project.getId(), project.getTitle(),
+                .map(project -> new ResponseNewProjectDTO(project.getId(),
+                        project.getTitle(),
+                        project.getCompanyName(),
                         project.getEik(), project.getStartDate(),
                         project.getEndDate()))
                 .collect(Collectors.toList());
@@ -122,6 +126,10 @@ public class ProjectService {
         if (updateProjectDTO.getEndDate() != null) {
         project.setEndDate(updateProjectDTO.getEndDate());
     }
+
+        if (updateProjectDTO.getCompany() != null) {
+            project.setCompanyName(updateProjectDTO.getCompany());
+        }
        ResponseNewProjectDTO response = new ResponseNewProjectDTO();
         Project savedProject = projectRepository.saveAndFlush(project);
         BeanUtils.copyProperties(savedProject, response);

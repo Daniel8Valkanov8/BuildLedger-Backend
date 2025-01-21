@@ -21,6 +21,7 @@ import java.util.Set;
 public class Project extends BaseEntity {
 
     private String title;
+    private String companyName;
     private LocalDate startDate;
     private LocalDate endDate;
     private String eik;
@@ -75,5 +76,13 @@ public class Project extends BaseEntity {
 
     public void setParcel(Parcel parcel) {
         this.parcel = parcel;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

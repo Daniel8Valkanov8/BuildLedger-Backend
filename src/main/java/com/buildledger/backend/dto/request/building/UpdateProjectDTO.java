@@ -8,12 +8,21 @@ import java.time.LocalDate;
 @Setter
 public class UpdateProjectDTO {
     private String title;
+    private String company;
     private LocalDate startDate;
     private LocalDate endDate;
     private String eik;
 
     public String getTitle() {
         return title;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public void setTitle(String title) {

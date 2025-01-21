@@ -2,8 +2,11 @@ package com.buildledger.backend.controller;
 
 
 import com.buildledger.backend.dto.request.building.CreateNewProjectDTO;
+import com.buildledger.backend.dto.request.building.UpdateParcelDTO;
+import com.buildledger.backend.dto.request.building.UpdateProjectDTO;
 import com.buildledger.backend.dto.responce.building.ResponseByIdProjectDTO;
 import com.buildledger.backend.dto.responce.building.ResponseNewProjectDTO;
+import com.buildledger.backend.dto.responce.building.ResponseParcelDTO;
 import com.buildledger.backend.service.impl.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin("http://localhost:3000")
 @RequestMapping("/projects")
 public class ProjectController {
 
@@ -47,6 +51,12 @@ public class ProjectController {
         String response = projectService.deleteProjectById(id);
         return new ResponseEntity<String>(response, HttpStatus.OK);
     }
+    @PutMapping("/{id}/update")
+    public ResponseEntity<ResponseNewProjectDTO>  updateParcelByProjectId(@PathVariable Long id, @RequestBody UpdateProjectDTO updateProjectDTO) {
+        ResponseNewProjectDTO responseParcelDTO = projectService.updateProject(id, updateProjectDTO);
+        return new ResponseEntity<>(responseParcelDTO,HttpStatus.OK);
+    }
+
 
     @GetMapping("/all")
     public ResponseEntity<List<ResponseNewProjectDTO>> getAllProjects() {

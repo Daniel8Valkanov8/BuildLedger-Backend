@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public class ResponseNewProjectDTO {
     private long id;
     private String title;
+    private String companyName;
     private String eik;
     private String address;
     private String parcelArea;
@@ -14,6 +15,14 @@ public class ResponseNewProjectDTO {
     private LocalDate endDate;
     private int buildingCount;
     private String buildingStatus;
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
 
     public long getId() {
         return id;
@@ -91,11 +100,12 @@ public class ResponseNewProjectDTO {
     }
 
     public ResponseNewProjectDTO(long id,
-                                 String title,
+                                 String title, String companyName,
                                  String eik,
                                  LocalDate startDate,
                                  LocalDate endDate) {
         this.id = id;
+        this.companyName=companyName;
         this.title = title;
         this.eik = eik;
         this.startDate = startDate;

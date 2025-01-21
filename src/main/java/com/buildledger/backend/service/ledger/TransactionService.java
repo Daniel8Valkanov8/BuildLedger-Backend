@@ -23,6 +23,7 @@ import org.springframework.data.repository.core.support.FragmentNotImplementedEx
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -145,6 +146,33 @@ public class TransactionService {
         }
         return sellLog;
     }
+
+    // Service Layer
+    public String deleteTransactionById(long id, long transactionId) {
+        try {
+            // Опитваме се да намерим транзакцията
+            Optional<Transaction> transactionOptional = transactionRepository.findById(transactionId);
+
+            if (transactionOptional.isPresent()) {
+                Transaction transaction = transactionOptional.get();
+
+                // Проверяваме дали транзакцията принадлежи на съответната сграда
+                if (transaction.getBuilding().getId() == id) {
+                    transactionRepository.delete(transaction);
+                    return "Successfully deleted transaction";
+                } else {
+                    return "Transaction does not belong to the specified building";
+                }
+            } else {
+                return "Transaction not found";
+            }
+        } catch (Exception e) {
+            // Логваме грешката и връщаме потребителско съобщение
+            e.printStackTrace();
+            return "An error occurred while attempting to delete the transaction";
+        }
+    }
+
 
     public ResponseTransactionDTO createIndependenceTransaction(long id, CreateTransactionDTO transactionDTO) throws FragmentNotImplementedException {
         Cooperation cooperation = cooperationRepository.findById(id).get();

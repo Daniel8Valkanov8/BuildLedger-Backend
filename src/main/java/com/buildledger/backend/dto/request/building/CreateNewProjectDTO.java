@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public class CreateNewProjectDTO {
 
     private String title;
+    private String companyName;
     private String eik;
     private String address;
     private double parcelArea;
@@ -17,15 +18,31 @@ public class CreateNewProjectDTO {
     private int buildingCount;
     private String buildingStatus;
 
-    public CreateNewProjectDTO(String title, String eik, String address, double parcelArea, LocalDate startDate, LocalDate endDate, int buildingCount, String buildingStatus) {
+    public CreateNewProjectDTO(String title,
+                               String eik, String address,
+                               double parcelArea,
+                               LocalDate startDate,
+                               LocalDate endDate,
+                               int buildingCount,
+                               String buildingStatus,
+                               String companyName) {
         this.title = title;
         this.eik = eik;
+        this.companyName = companyName;
         this.address = address;
         this.parcelArea = parcelArea;
         this.startDate = startDate;
         this.endDate = endDate;
         this.buildingCount = buildingCount;
         this.buildingStatus = buildingStatus;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public CreateNewProjectDTO() {

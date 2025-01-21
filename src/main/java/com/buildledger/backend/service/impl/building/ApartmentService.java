@@ -20,6 +20,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -299,17 +300,27 @@ public class ApartmentService {
         Apartment apartment = apartmentRepository.findById(apartmentId).orElse(null);
         if (apartment != null && apartment.isSold()) {
             String filePath = apartment.getSell().getFilePath();
-            System.out.println("File path: " + filePath);
 
-            Path path = Paths.get(filePath).toAbsolutePath(); // Use Paths to handle file paths correctly
-            if (Files.exists(path)) { // Use Files.exists for reliable file existence check
+            Path path = Paths.get(filePath).toAbsolutePath();
+            if (Files.exists(path) && Files.isReadable(path)) {
                 return new UrlResource(path.toUri());
             } else {
-                System.err.println("File does not exist: " + filePath);
+                throw new FileNotFoundException("File not found or is not readable at path: " + filePath);
             }
         }
-        return null; // No file if the apartment is not sold or file not found
+        throw new IllegalStateException("Apartment is not sold or file path is missing.");
     }
+    public String getFileName(long apartmentId) {
+        Apartment apartment = apartmentRepository.findById(apartmentId).orElse(null);
+        if (apartment != null && apartment.isSold()) {
+            // Връщаме името на файла, както е записано в базата
+            return Paths.get(apartment.getSell().getFilePath()).getFileName().toString();
+        }
+        throw new IllegalStateException("Apartment is not sold or file path is missing.");
+    }
+
+
+
 
 
 }

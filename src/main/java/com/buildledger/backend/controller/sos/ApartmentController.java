@@ -8,10 +8,13 @@ import com.buildledger.backend.service.impl.building.ApartmentService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -57,10 +60,13 @@ public class ApartmentController {
     public ResponseEntity<Resource> getContractOfApartment(@PathVariable long apartmentId) {
         try {
             Resource resource = apartmentService.getContract(apartmentId);
-            if (resource != null) {
-                String fileName = resource.getFilename() != null ? resource.getFilename() : "downloaded-file";
+            if (resource != null && resource.exists()) {
+                // Получаваме оригиналното име на файла от базата данни
+                String fileName = apartmentService.getFileName(apartmentId);
+
                 return ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM) // Универсален MIME тип
                         .body(resource);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -69,6 +75,9 @@ public class ApartmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    
+
 
 
 

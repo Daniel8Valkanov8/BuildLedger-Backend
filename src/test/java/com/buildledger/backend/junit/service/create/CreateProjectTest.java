@@ -54,7 +54,8 @@ public class CreateProjectTest {
                 LocalDate.of(2024, 1, 1),
                 LocalDate.of(2025, 1, 1),
                 10,
-                "Cooperation"
+                "Cooperation",
+                "Company"
         );
 
         Project savedProject = new Project();

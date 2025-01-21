@@ -28,6 +28,28 @@ public class TransactionController {
             return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // Controller Layer
+    @DeleteMapping("/transactions/{transactionId}/delete")
+    public ResponseEntity<String> deleteTransactionById(@PathVariable long id, @PathVariable long transactionId) {
+        try {
+            String response = transactionService.deleteTransactionById(id, transactionId);
+
+            // Определяме правилния статус според отговора
+            if (response.equals("Successfully deleted transaction")) {
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else if (response.equals("Transaction not found") || response.equals("Transaction does not belong to the specified building")) {
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            } else {
+                return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            // В случай на неочаквана грешка
+            e.printStackTrace();
+            return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PostMapping("/create-indipendense-transaction")
     public ResponseEntity<ResponseTransactionDTO> createIndipendenseTransaction(@PathVariable long id, @RequestBody CreateTransactionDTO transactionDTO) {
 

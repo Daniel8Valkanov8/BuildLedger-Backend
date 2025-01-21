@@ -107,7 +107,7 @@ public class ParcelService {
     // Метод за конвертиране на Parcel към ResponseParcelDto
     private ResponseParcelDTO convertToDto(Parcel parcel) {
         ResponseParcelDTO dto = new ResponseParcelDTO();
-
+        dto.setPriceEur(parcel.getPriceEur());
         dto.setId(parcel.getId());
         dto.setEik(parcel.getEik());
         dto.setAddress(parcel.getAddress());
@@ -136,15 +136,16 @@ public class ParcelService {
         if (parcelDTO.getPercentageOfCompensation() > 0) {
             parcel.setPercentageOfCompensation(parcelDTO.getPercentageOfCompensation());
         }
-        parcel.setPriceEur(parcelDTO.getPriceEur());
+
 
         parcel.setCompensated(parseBoolean(parcelDTO.getIsCompensated()));
         parcel.setRegular(parseBoolean(parcelDTO.getIsRegular()));
         parcel.setWithElectricityAndWater(parseBoolean(parcelDTO.getWithElectricityAndWater()));
-
+        parcel.setPriceEur(parcelDTO.getPriceEur());
         Parcel saved = parcelRepository.saveAndFlush(parcel);
         ResponseParcelDTO response = new ResponseParcelDTO();
         BeanUtils.copyProperties(saved, response);
+        response.setPriceEur(saved.getPriceEur());
         return response;
     }
 
